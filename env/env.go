@@ -2,8 +2,9 @@ package env
 
 import (
 	"github.com/joho/godotenv"
+	"log"
 	"os"
-	"path/filepath"
+	"regexp"
 )
 
 type env struct {
@@ -85,16 +86,14 @@ func getInstance() *env {
 }
 
 func InitEnv() {
-	err := godotenv.Load()
+	const projectDirName = "expense-tracker"
+	projectName := regexp.MustCompile(`^(.*` + projectDirName + `)`)
+	currentWorkDirectory, _ := os.Getwd()
+	rootPath := projectName.Find([]byte(currentWorkDirectory))
+
+	err := godotenv.Load(string(rootPath) + `/.env`)
+
 	if err != nil {
-		execPath, err := os.Executable()
-		if err != nil {
-			panic(err)
-		}
-		envPath := filepath.Join(filepath.Dir(execPath), ".env")
-		err = godotenv.Load(envPath)
-		if err != nil {
-			panic(err)
-		}
+		log.Fatalf("Error loading .env file")
 	}
 }
