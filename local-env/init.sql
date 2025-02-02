@@ -3,7 +3,7 @@ CREATE DATABASE app;
 USE app;
 CREATE TABLE `user`
 (
-    `id`         int          NOT NULL AUTO_INCREMENT,
+    `id`         int unsigned NOT NULL AUTO_INCREMENT,
     `first_name` varchar(255) NOT NULL,
     `last_name`  varchar(255) NOT NULL,
     `email`      varchar(255) NOT NULL,
@@ -19,8 +19,16 @@ CREATE TABLE `account`
     `name`            varchar(255) NOT NULL,
     `primary_user_id` int unsigned NOT NULL,
     `created_on`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_on`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_on`      datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `user_account`
+(
+    `id`         int unsigned NOT NULL AUTO_INCREMENT,
+    `user_id`    int unsigned NOT NULL,
+    `account_id` int unsigned NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `user_id` (`user_id`,`account_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `merchant_type`
 (
