@@ -6,29 +6,25 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/katerji/expense-tracker/env"
-	"os"
-	"strconv"
 	"time"
 )
 
-type JWTService struct{}
-
 type customJWTClaims struct {
-	User      User  `json:"user"`
+	User      *User `json:"user"`
 	ExpiresAt int64 `json:"expires_at"`
 }
 
-func (jwtService JWTService) VerifyToken(token string) (User, error) {
+func (s *Service) verifyToken(token string) (*User, error) {
 	jwtSecret := env.JWTToken()
-	return jwtService.validateToken(token, jwtSecret)
+	return s.validateToken(token, jwtSecret)
 }
 
-func (jwtService JWTService) VerifyRefreshToken(token string) (User, error) {
+func (s *Service) verifyRefreshToken(token string) (*User, error) {
 	jwtSecret := env.JWTRefreshToken()
-	return jwtService.validateToken(token, jwtSecret)
+	return s.validateToken(token, jwtSecret)
 }
 
-func (jwtService JWTService) validateToken(token, jwtSecret string) (User, error) {
+func (s *Service) validateToken(token, jwtSecret string) (*User, error) {
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -36,63 +32,95 @@ func (jwtService JWTService) validateToken(token, jwtSecret string) (User, error
 		return []byte(jwtSecret), nil
 	})
 	if err != nil {
-		return User{}, errors.New("error parsing token")
+		return nil, errors.New("error parsing token")
 	}
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		jsonClaims, err := json.Marshal(claims)
-		if err != nil {
-			return User{}, errors.New("error parsing token")
-		}
-		var customClaims customJWTClaims
-		if err := json.Unmarshal(jsonClaims, &customClaims); err != nil {
-			return User{}, errors.New("error parsing token")
-		}
-		expiresAt := time.Unix(customClaims.ExpiresAt, 0)
-		if expiresAt.Before(time.Now()) {
-			return User{}, errors.New("token expired")
-		}
-		return customClaims.User, nil
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+
+	if !ok || !parsedToken.Valid {
+		return nil, errors.New("invalid token")
 	}
 
-	return User{}, errors.New("invalid token")
+	jsonClaims, err := json.Marshal(claims)
+	if err != nil {
+		return nil, errors.New("error parsing token")
+	}
+
+	var customClaims customJWTClaims
+	if err := json.Unmarshal(jsonClaims, &customClaims); err != nil {
+		return nil, errors.New("error parsing token")
+	}
+
+	expiresAt := time.Unix(customClaims.ExpiresAt, 0)
+	if expiresAt.Before(time.Now()) {
+		return nil, errors.New("token expired")
+	}
+
+	return customClaims.User, nil
 }
 
-func (jwtService JWTService) CreateJwt(user User) (string, error) {
+type jwtPair struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+func (s *Service) createJWTPair(user *User) (*jwtPair, error) {
+	accessToken, err := s.createJwt(user)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := s.createRefreshJwt(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &jwtPair{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (s *Service) createJwt(user *User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
 		"expires_at": getJWTExpiry(),
 	})
-	jwtSecret := os.Getenv("JWT_SECRET")
+
+	jwtSecret := env.JWTToken()
+
 	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", err
 	}
+
 	return tokenString, nil
 }
 
-func (jwtService JWTService) CreateRefreshJwt(user User) (string, error) {
+func (s *Service) createRefreshJwt(user *User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
 		"expires_at": getJWTRefreshExpiry(),
 	})
-	jwtSecret := os.Getenv("JWT_REFRESH_SECRET")
+	jwtSecret := env.JWTRefreshToken()
+
 	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", err
 	}
+
 	return tokenString, nil
 }
 
 func getJWTExpiry() int64 {
-	expiryString := os.Getenv("JWT_EXPIRY")
-	expiry, _ := strconv.Atoi(expiryString)
-	return intToUnixTime(expiry)
+	const oneWeekInSeconds = 604800
+
+	return intToUnixTime(oneWeekInSeconds)
 }
 
 func getJWTRefreshExpiry() int64 {
-	expiryString := os.Getenv("JWT_REFRESH_EXPIRY")
-	expiry, _ := strconv.Atoi(expiryString)
-	return intToUnixTime(expiry)
+	const oneMonthInSeconds = 2592000
+
+	return intToUnixTime(oneMonthInSeconds)
 }
 
 func intToUnixTime(num int) int64 {

@@ -1,5 +1,5 @@
 -- name: FetchUserByEmailQuery :one
-SELECT id, email, first_name, last_name FROM user
+SELECT id, email, first_name, last_name, password FROM user
 WHERE email = ?;
 
 -- name: InsertUserQuery :exec

@@ -8,40 +8,40 @@ import (
 )
 
 type env struct {
-	jWTToken        string
-	jWTRefreshToken string
-	dbHost          string
-	dbPassword      string
-	dbUser          string
-	dbPort          string
-	dbName          string
-	redisURL        string
-	webServerPort   string
-	openAISecret    string
+	jwtSecret        string
+	jwtRefreshSecret string
+	dbHost           string
+	dbPassword       string
+	dbUser           string
+	dbPort           string
+	dbName           string
+	redisURL         string
+	webServerPort    string
+	openAISecret     string
 }
 
 func newEnv() *env {
 	InitEnv()
 	return &env{
-		jWTToken:        os.Getenv("JWT_SECRET"),
-		jWTRefreshToken: os.Getenv("JWT_REFRESH_SECRET"),
-		dbHost:          os.Getenv("DB_HOST"),
-		dbPassword:      os.Getenv("DB_PASSWORD"),
-		dbUser:          os.Getenv("DB_USERNAME"),
-		dbPort:          os.Getenv("DB_PORT"),
-		dbName:          os.Getenv("DB_DATABASE"),
-		redisURL:        os.Getenv("UPSTASH_REDIS_URL"),
-		webServerPort:   os.Getenv("WEB_SERVER_PORT"),
-		openAISecret:    os.Getenv("OPEN_AI_SECRET"),
+		jwtSecret:        os.Getenv("JWT_SECRET"),
+		jwtRefreshSecret: os.Getenv("JWT_REFRESH_SECRET"),
+		dbHost:           os.Getenv("DB_HOST"),
+		dbPassword:       os.Getenv("DB_PASSWORD"),
+		dbUser:           os.Getenv("DB_USERNAME"),
+		dbPort:           os.Getenv("DB_PORT"),
+		dbName:           os.Getenv("DB_DATABASE"),
+		redisURL:         os.Getenv("UPSTASH_REDIS_URL"),
+		webServerPort:    os.Getenv("WEB_SERVER_PORT"),
+		openAISecret:     os.Getenv("OPEN_AI_SECRET"),
 	}
 }
 
 func JWTToken() string {
-	return getInstance().jWTToken
+	return getInstance().jwtSecret
 }
 
 func JWTRefreshToken() string {
-	return getInstance().jWTRefreshToken
+	return getInstance().jwtRefreshSecret
 }
 
 func DbHost() string {

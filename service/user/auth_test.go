@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestService_Register(t *testing.T) {
 	service := Service{}
 
 	input := Input{
@@ -17,13 +17,12 @@ func TestCreateUser(t *testing.T) {
 		Password:  uuid.NewString(),
 	}
 
-	u, errs := service.createUser(context.Background(), input)
-	if len(errs) != 0 {
-		for _, err := range errs {
-			t.Error(err)
-		}
-		t.Fatal("")
+	loginRes, err := service.Register(context.Background(), input)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	u := loginRes.User
 
 	if u.FirstName != input.FirstName {
 		t.Errorf("exepcted first name %s, got %s instead", input.FirstName, u.FirstName)
@@ -36,5 +35,9 @@ func TestCreateUser(t *testing.T) {
 	}
 	if u.ID == 0 {
 		t.Error("exepcted id to be set")
+	}
+
+	if loginRes.JWTPair.AccessToken == "" || loginRes.JWTPair.RefreshToken == "" {
+		t.Fatal("expected AccessToken & Refresh Token to be set ")
 	}
 }

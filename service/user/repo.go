@@ -41,6 +41,7 @@ func (r repo) fetchUser(ctx context.Context, email string) (*User, error) {
 		FirstName: res.FirstName,
 		LastName:  res.LastName,
 		Email:     res.Email,
+		Password:  res.Password,
 	}, nil
 }
 
