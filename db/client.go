@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/katerji/expense-tracker/db/generated"
 	"github.com/katerji/expense-tracker/env"
 	"time"
