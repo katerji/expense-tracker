@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/katerji/expense-tracker/env"
 	"io"
 	"net/http"
 )
@@ -75,7 +76,7 @@ func (o openAI) chat(ctx context.Context, message string) openAIResult {
 }
 
 func (o openAI) getAuthorizationToken() string {
-	return ""
+	return env.OpenAISecret()
 }
 
 func (o openAI) setOpenAIChatRequestHeaders(request *http.Request) {
