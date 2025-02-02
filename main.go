@@ -1,1 +1,7 @@
-package expense_tracker
+package main
+
+import "github.com/katerji/expense-tracker/env"
+
+func main() {
+	env.InitEnv()
+}
