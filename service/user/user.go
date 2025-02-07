@@ -13,6 +13,19 @@ type User struct {
 	Password  string
 }
 
+func (u *User) Ctx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, User{}, u)
+}
+
+func FromCtx(ctx context.Context) User {
+	u, ok := ctx.Value(User{}).(User)
+	if !ok {
+		return User{}
+	}
+
+	return u
+}
+
 type Input struct {
 	FirstName string
 	LastName  string

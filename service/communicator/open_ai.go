@@ -12,26 +12,17 @@ import (
 
 type openAI struct{}
 
-type openAIResult struct {
-	content   string
-	hasResult bool
-}
-
-func (o openAI) chat(ctx context.Context, message string) openAIResult {
+func (o openAI) Get(ctx context.Context, message string) (map[string]any, bool) {
 	const url = "https://api.openai.com/v1/chat/completions"
 	jsonBody, err := json.Marshal(defaultOpenAIRequestWithMessage(message))
 	if err != nil {
 		//TODO add logs
-		return openAIResult{
-			hasResult: false,
-		}
+		return nil, false
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		//TODO add logs
-		return openAIResult{
-			hasResult: false,
-		}
+		return nil, false
 	}
 	o.setOpenAIChatRequestHeaders(req)
 
@@ -39,9 +30,7 @@ func (o openAI) chat(ctx context.Context, message string) openAIResult {
 	resp, err := client.Do(req)
 	if err != nil {
 		//TODO add logs
-		return openAIResult{
-			hasResult: false,
-		}
+		return nil, false
 	}
 	defer resp.Body.Close()
 
@@ -49,30 +38,21 @@ func (o openAI) chat(ctx context.Context, message string) openAIResult {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		//TODO add logs
-		return openAIResult{
-			hasResult: false,
-		}
+		return nil, false
 	}
 
 	if resp.StatusCode != 200 {
-		return openAIResult{
-			hasResult: false,
-		}
+		return nil, false
 	}
 
 	bodyAsMap := make(map[string]any)
 	err = json.Unmarshal(body, &bodyAsMap)
 	if err != nil {
 		//TODO add logs
-		return openAIResult{
-			hasResult: false,
-		}
-	}
-	return openAIResult{
-		content:   "ok",
-		hasResult: true,
+		return nil, false
 	}
 
+	return bodyAsMap, true
 }
 
 func (o openAI) getAuthorizationToken() string {

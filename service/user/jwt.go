@@ -14,12 +14,12 @@ type customJWTClaims struct {
 	ExpiresAt int64 `json:"expires_at"`
 }
 
-func (s *Service) verifyToken(token string) (*User, error) {
+func (s *Service) VerifyToken(token string) (*User, error) {
 	jwtSecret := env.JWTToken()
 	return s.validateToken(token, jwtSecret)
 }
 
-func (s *Service) verifyRefreshToken(token string) (*User, error) {
+func (s *Service) VerifyRefreshToken(token string) (*User, error) {
 	jwtSecret := env.JWTRefreshToken()
 	return s.validateToken(token, jwtSecret)
 }
