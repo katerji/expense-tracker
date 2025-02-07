@@ -8,6 +8,7 @@ import (
 	"github.com/katerji/expense-tracker/env"
 	"io"
 	"net/http"
+	"net/url"
 )
 
 type openAI struct{}
@@ -45,14 +46,57 @@ func (o openAI) Get(ctx context.Context, message string) (map[string]any, bool) 
 		return nil, false
 	}
 
-	bodyAsMap := make(map[string]any)
-	err = json.Unmarshal(body, &bodyAsMap)
+	bodyJSON := make(map[string]any)
+	err = json.Unmarshal(body, &bodyJSON)
 	if err != nil {
 		//TODO add logs
 		return nil, false
 	}
 
-	return bodyAsMap, true
+	choicesResponse, ok := bodyJSON["choices"]
+	if !ok {
+		return nil, false
+	}
+	choicesResponseArray, ok := choicesResponse.([]any)
+	if !ok {
+		return nil, false
+	}
+
+	if len(choicesResponseArray) == 0 {
+		return nil, false
+	}
+
+	choicesObject, ok := choicesResponseArray[0].(map[string]any)
+	if !ok {
+		return nil, false
+	}
+
+	choicesMessageObjectRaw, ok := choicesObject["message"]
+	if !ok {
+		return nil, false
+	}
+
+	choicesMessageObject, ok := choicesMessageObjectRaw.(map[string]any)
+	if !ok {
+		return nil, false
+	}
+
+	contentRaw, ok := choicesMessageObject["content"]
+	if !ok {
+		return nil, false
+	}
+
+	contentString, ok := contentRaw.(string)
+	if !ok {
+		return nil, false
+	}
+
+	content := map[string]any{}
+	err = json.Unmarshal([]byte(contentString), &content)
+	if err != nil {
+		return nil, false
+	}
+	return content, true
 }
 
 func (o openAI) getAuthorizationToken() string {
@@ -90,6 +134,10 @@ type openAIRequestFormat struct {
 }
 
 func defaultOpenAIRequestWithMessage(message string) openAIRequest {
+	messageSuffix := "Extract the amount, currency, merchant, merchant_type (e.g., restaurant, groceries, entertainment, utilities, household, etc.), and time_of_purchase (in YYYY-MM-DD HH:MM:SS format) from the following transaction message. Return only a JSON object with these fields. If any field is missing, set it to null. Message: "
+	messageToSend := fmt.Sprintf("%s%s", messageSuffix, message)
+	messageToSend = url.QueryEscape(messageToSend)
+
 	const (
 		model               = "gpt-4o-mini"
 		role                = "user"
@@ -109,7 +157,7 @@ func defaultOpenAIRequestWithMessage(message string) openAIRequest {
 				Content: []openAIRequestContent{
 					{
 						Type: contentType,
-						Text: message,
+						Text: messageToSend,
 					},
 				},
 			},

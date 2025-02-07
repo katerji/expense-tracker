@@ -2,3 +2,4 @@
 .env
 db/generated
 db/generated/*
+.idea/workspace.xml

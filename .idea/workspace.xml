@@ -5,20 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="117f00cc-af7c-42a5-857d-06c3655a7ca4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/handler/login_handler.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/communicator/communicator.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/merchant/merchant_fetcher.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/parser/parser_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webserver/middleware.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webserver/server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/handler/record_transaction_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/communicator/open_ai.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/communicator/open_ai.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/parser/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/user/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/user/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/user/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/user/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +60,16 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Go Build.main">
+    <configuration name="main" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="expense-tracker" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <package value="github.com/katerji/expense-tracker" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestParse in github.com/katerji/expense-tracker/service/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="expense-tracker" />
       <working_directory value="$PROJECT_DIR$/service/parser" />
@@ -80,6 +82,10 @@
       <pattern value="^\QTestParse\E$" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Go Build.main" />
+      <item itemvalue="Go Test.TestParse in github.com/katerji/expense-tracker/service/parser" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.TestParse in github.com/katerji/expense-tracker/service/parser" />
@@ -92,5 +98,31 @@
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/communicator/open_ai.go</url>
+          <line>55</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/parser/parser.go</url>
+          <line>25</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/parser/parser.go</url>
+          <line>66</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/parser/parser.go</url>
+          <line>96</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

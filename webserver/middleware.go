@@ -47,5 +47,6 @@ func anonRoutes() []string {
 	return []string{
 		"/auth/register",
 		"/auth/login",
+		"/transaction",
 	}
 }

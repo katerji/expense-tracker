@@ -50,7 +50,7 @@ func parserResultFromMap(rawJson map[string]any) (*parserResult, error) {
 
 	if timeOfPurchaseJSON, found := rawJson["time_of_purchase"]; found {
 		if timeOfPurchaseJSONString, ok := timeOfPurchaseJSON.(string); ok {
-			if timeOfPurchaseTime, err := time.Parse(time.DateTime, timeOfPurchaseJSONString); err != nil {
+			if timeOfPurchaseTime, err := time.Parse(time.datetime, timeOfPurchaseJSONString); err != nil {
 				timeOfPurchase = timeOfPurchaseTime.Unix()
 			}
 		}
@@ -84,7 +84,7 @@ func (p genericParser) Parse(ctx context.Context, message string) (*parserResult
 	fetchPayload, ok := fetcher.Fetch(ctx, message)
 	if ok {
 		result, err := parserResultFromMap(fetchPayload)
-		if err != nil {
+		if err == nil {
 			return result, true
 		}
 		// TODO add logs
@@ -94,7 +94,7 @@ func (p genericParser) Parse(ctx context.Context, message string) (*parserResult
 	fetchPayload, ok = comm.Get(ctx, message)
 	if ok {
 		result, err := parserResultFromMap(fetchPayload)
-		if err != nil {
+		if err == nil {
 			return result, true
 		}
 		// TODO add logs
