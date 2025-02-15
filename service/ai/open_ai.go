@@ -1,4 +1,4 @@
-package communicator
+package ai
 
 import (
 	"bytes"
@@ -8,19 +8,18 @@ import (
 	"github.com/katerji/expense-tracker/env"
 	"io"
 	"net/http"
-	"net/url"
 )
 
 type openAI struct{}
 
-func (o openAI) Get(ctx context.Context, message string) (map[string]any, bool) {
-	const url = "https://api.openai.com/v1/chat/completions"
-	jsonBody, err := json.Marshal(defaultOpenAIRequestWithMessage(message))
+func (o openAI) Search(ctx context.Context, message string) (map[string]any, bool) {
+	const openAPIURL = "https://api.openai.com/v1/chat/completions"
+	jsonBody, err := json.Marshal(defaultOpenAIRequestWithMessages(message))
 	if err != nil {
 		//TODO add logs
 		return nil, false
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, openAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		//TODO add logs
 		return nil, false
@@ -41,15 +40,13 @@ func (o openAI) Get(ctx context.Context, message string) (map[string]any, bool) 
 		//TODO add logs
 		return nil, false
 	}
-
-	if resp.StatusCode != 200 {
-		return nil, false
-	}
-
 	bodyJSON := make(map[string]any)
 	err = json.Unmarshal(body, &bodyJSON)
 	if err != nil {
 		//TODO add logs
+
+	}
+	if resp.StatusCode != 200 {
 		return nil, false
 	}
 
@@ -96,6 +93,7 @@ func (o openAI) Get(ctx context.Context, message string) (map[string]any, bool) 
 	if err != nil {
 		return nil, false
 	}
+
 	return content, true
 }
 
@@ -133,11 +131,7 @@ type openAIRequestFormat struct {
 	Type string `json:"type"`
 }
 
-func defaultOpenAIRequestWithMessage(message string) openAIRequest {
-	messageSuffix := "Extract the amount, currency, merchant, merchant_type (e.g., restaurant, groceries, entertainment, utilities, household, etc.), and time_of_purchase (in YYYY-MM-DD HH:MM:SS format) from the following transaction message. Return only a JSON object with these fields. If any field is missing, set it to null. Message: "
-	messageToSend := fmt.Sprintf("%s%s", messageSuffix, message)
-	messageToSend = url.QueryEscape(messageToSend)
-
+func defaultOpenAIRequestWithMessages(message string) openAIRequest {
 	const (
 		model               = "gpt-4o-mini"
 		role                = "user"
@@ -157,7 +151,7 @@ func defaultOpenAIRequestWithMessage(message string) openAIRequest {
 				Content: []openAIRequestContent{
 					{
 						Type: contentType,
-						Text: messageToSend,
+						Text: message,
 					},
 				},
 			},

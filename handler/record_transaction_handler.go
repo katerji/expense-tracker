@@ -1,17 +1,16 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/katerji/expense-tracker/service/parser"
 	"net/http"
 )
 
-const RecordTransactionRoute = "/transaction"
+const RecordTransactionRoute = "/transactions"
 
 type RecordTransactionRequest struct {
-	Message string `json:"message"`
+	TransactionMessages string `json:"transactions"`
 }
 
 func RecordTransactionHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,9 +23,16 @@ func RecordTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+	ctx := r.Context()
 
-	p := parser.NewParser()
-	res, _ := p.Parse(context.Background(), req.Message)
-	fmt.Println(res)
-
+	transactionSplitter := parser.NewTransactionSplitter()
+	transactionMessages, ok := transactionSplitter.Split(ctx, req.TransactionMessages)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("bad request"))
+		fmt.Println(err)
+		return
+	}
+	p := parser.NewDetailExtractor()
+	p.Extract(ctx, transactionMessages)
 }
