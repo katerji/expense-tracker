@@ -17,8 +17,8 @@ var successTimeOfPurchase = time.Now().Unix()
 
 type parserMockSuccess struct{}
 
-func (p parserMockSuccess) Parse(_ context.Context, _ string) (*extractionResult, bool) {
-	return &extractionResult{
+func (p parserMockSuccess) Parse(_ context.Context, _ string) (*transaction, bool) {
+	return &transaction{
 		Amount:         successAmount,
 		Currency:       successCurrency,
 		TimeOfPurchase: successTimeOfPurchase,

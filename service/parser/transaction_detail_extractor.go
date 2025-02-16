@@ -10,11 +10,6 @@ type transaction struct {
 	TimeOfPurchase int64   `json:"string"`
 	Description    string  `json:"description"`
 	Merchant       string  `json:"merchant"`
-	IsValid        bool
-}
-
-func (t transaction) Valid() bool {
-	return t.IsValid
 }
 
 type TransactionDetailExtractor interface {

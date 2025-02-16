@@ -70,7 +70,6 @@ func (ade aiDetailExtractor) parseAIResult(aiResult map[string]any) ([]transacti
 		if err != nil {
 			continue
 		}
-		item.IsValid = true
 		items = append(items, item)
 	}
 
