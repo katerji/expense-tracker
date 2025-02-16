@@ -2,18 +2,35 @@ package parser
 
 import (
 	"context"
-	"github.com/katerji/expense-tracker/service/fetcher"
 )
 
+type transaction struct {
+	Amount         float64 `json:"amount"`
+	Currency       string  `json:"currency"`
+	TimeOfPurchase int64   `json:"string"`
+	Description    string  `json:"description"`
+	Merchant       string  `json:"merchant"`
+	IsValid        bool
+}
+
+func (t transaction) Valid() bool {
+	return t.IsValid
+}
+
 type TransactionDetailExtractor interface {
-	Extract(context.Context, []string) ([]fetcher.FetchItem, bool)
+	Extract(context.Context, []string) ([]transaction, bool)
 }
 
 type detailExtractor struct{}
 
-func (p detailExtractor) Extract(ctx context.Context, transactionMessages []string) ([]fetcher.FetchItem, bool) {
-	return fetcher.New().Fetch(ctx, transactionMessages)
+func (p detailExtractor) Extract(ctx context.Context, transactionMessages []string) ([]transaction, bool) {
+	local := newLocalExtractor()
+	if messages, ok := local.Extract(ctx, transactionMessages); ok {
+		return messages, true
+	}
 
+	aiExtractor := newAIDetailExtractor()
+	return aiExtractor.Extract(ctx, transactionMessages)
 }
 
 func NewDetailExtractor() TransactionDetailExtractor {

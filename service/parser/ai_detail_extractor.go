@@ -1,4 +1,4 @@
-package fetcher
+package parser
 
 import (
 	"context"
@@ -9,20 +9,13 @@ import (
 	"strings"
 )
 
-type service struct{}
+type aiDetailExtractor struct{}
 
-func (s service) Fetch(ctx context.Context, messages []string) ([]FetchItem, bool) {
-	return s.fetchFromAI(ctx, messages)
-
+func newAIDetailExtractor() TransactionDetailExtractor {
+	return aiDetailExtractor{}
 }
 
-func (s service) fetchFromDB(ctx context.Context, messages []string) ([]FetchItem, bool) {
-	db := newDBFetcher()
-
-	return db.Fetch(ctx, messages)
-}
-
-func (s service) fetchFromAI(ctx context.Context, messages []string) ([]FetchItem, bool) {
+func (ade aiDetailExtractor) Extract(ctx context.Context, messages []string) ([]transaction, bool) {
 	instance := ai.New()
 
 	aiResult, ok := instance.Search(ctx, getDefaultAIMessage(messages))
@@ -30,20 +23,8 @@ func (s service) fetchFromAI(ctx context.Context, messages []string) ([]FetchIte
 		return nil, false
 	}
 
-	return s.parseAIResult(aiResult)
+	return ade.parseAIResult(aiResult)
 
-}
-
-func getDefaultAIMessageV1(messages []string) string {
-	messageSuffix := "Extract the amount, currency, merchant, merchant_type (e.g., restaurant, groceries, entertainment, utilities, household, etc.), " +
-		"and time_of_purchase (in YYYY-MM-DD HH:MM:SS format) from the following transaction messages that are separated by a new line. " +
-		"Return a json object with transactions as key, and value of array of JSON objects with these fields.  " +
-		"If any field is missing, set it to null. transactionMessages: "
-	messagesAsOneString := strings.Join(messages, "\n")
-	messageToSend := fmt.Sprintf("%s%s", messageSuffix, messagesAsOneString)
-	messageToSend = url.QueryEscape(messageToSend)
-
-	return messageToSend
 }
 
 func getDefaultAIMessage(messages []string) string {
@@ -69,14 +50,14 @@ func getDefaultAIMessage(messages []string) string {
 	return messageToSend
 }
 
-func (s service) parseAIResult(aiResult map[string]any) ([]FetchItem, bool) {
+func (ade aiDetailExtractor) parseAIResult(aiResult map[string]any) ([]transaction, bool) {
 	transactionsRaw, ok := aiResult["transactions"].([]any)
 	if !ok {
 		return nil, false
 	}
-	items := []FetchItem{}
-	for _, transaction := range transactionsRaw {
-		transactionMap, ok := transaction.(map[string]any)
+	items := []transaction{}
+	for _, transactionRaw := range transactionsRaw {
+		transactionMap, ok := transactionRaw.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -84,12 +65,12 @@ func (s service) parseAIResult(aiResult map[string]any) ([]FetchItem, bool) {
 		if err != nil {
 			continue
 		}
-		var item FetchItem
+		var item transaction
 		err = json.Unmarshal(transactionAsString, &item)
 		if err != nil {
 			continue
 		}
-		item.isValid = true
+		item.IsValid = true
 		items = append(items, item)
 	}
 
