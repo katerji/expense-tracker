@@ -1,4 +1,4 @@
-package user
+package account
 
 import "context"
 
@@ -30,10 +30,10 @@ func (s *Service) CreateAccount(ctx context.Context, input CreateAccountInput) (
 }
 
 func (a *Account) Ctx(ctx context.Context) context.Context {
-	return context.WithValue(ctx, User{}, a)
+	return context.WithValue(ctx, Account{}, a)
 }
 
-func AccountFromCtx(ctx context.Context) Account {
+func FromCtx(ctx context.Context) Account {
 	a, ok := ctx.Value(Account{}).(Account)
 	if !ok {
 		return Account{}

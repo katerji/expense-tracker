@@ -1,4 +1,4 @@
-package user
+package account
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 )
 
 type CustomJWTClaims struct {
-	UserID    uint32 `json:"user_id"`
+	AccountID uint32 `json:"account_id"`
 	ExpiresAt int64  `json:"expires_at"`
 }
 
@@ -58,29 +58,29 @@ func (s *Service) validateToken(token, jwtSecret string) (*CustomJWTClaims, erro
 	return &customClaims, nil
 }
 
-type jwtPair struct {
+type JWTPair struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
-func (s *Service) createJWTPair(user *User) (*jwtPair, error) {
-	accessToken, err := s.createJwt(user)
+func (s *Service) CreateJWTPair(account *Account) (*JWTPair, error) {
+	accessToken, err := s.createJwt(account)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.createRefreshJwt(user)
+	refreshToken, err := s.createRefreshJwt(account)
 	if err != nil {
 		return nil, err
 	}
 
-	return &jwtPair{
+	return &JWTPair{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (s *Service) createJwt(user *User) (string, error) {
+func (s *Service) createJwt(user *Account) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
 		"expires_at": getJWTExpiry(),
@@ -96,7 +96,7 @@ func (s *Service) createJwt(user *User) (string, error) {
 	return tokenString, nil
 }
 
-func (s *Service) createRefreshJwt(user *User) (string, error) {
+func (s *Service) createRefreshJwt(user *Account) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
 		"expires_at": getJWTRefreshExpiry(),
