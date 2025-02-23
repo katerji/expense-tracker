@@ -9,6 +9,15 @@ func FetchMerchantByName(ctx context.Context, name string) (generated.FetchMerch
 	return getInstance().FetchMerchantByNameQuery(ctx, name)
 }
 
+func FetchMerchantType(ctx context.Context, typeName string) (*generated.MerchantType, bool) {
+	res, err := getInstance().FetchMerchantTypeQuery(ctx, typeName)
+	if err != nil {
+		return nil, false
+	}
+
+	return &res, true
+}
+
 func InsertMerchantType(ctx context.Context, typeName string) (uint32, bool) {
 	res, err := getInstance().InsertMerchantTypeQuery(ctx, typeName)
 	if err != nil {

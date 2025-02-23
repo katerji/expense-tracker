@@ -1,6 +1,8 @@
 -- name: FetchMerchantByNameQuery :one
-SELECT id, name, type_id FROM merchant
-WHERE name = ?;
+SELECT m.id, m.name, m.type_id, mt.type as merchant_type
+FROM merchant m
+         JOIN merchant_type mt ON m.type_id = mt.id
+WHERE type = ?;
 
 -- name: FetchMerchantTypeQuery :one
 SELECT id, type
