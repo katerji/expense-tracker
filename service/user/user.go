@@ -60,5 +60,9 @@ func (i Input) validate() error {
 }
 
 func (s *Service) fetchUserByEmail(ctx context.Context, email string) (*User, error) {
-	return s.repo.fetchUser(ctx, email)
+	return s.repo.fetchUserByEmail(ctx, email)
+}
+
+func (s *Service) GetUserByID(ctx context.Context, id uint32) (*User, error) {
+	return s.repo.fetchUserByID(ctx, id)
 }

@@ -15,7 +15,7 @@ func InsertUser(ctx context.Context, params generated.InsertUserQueryParams) err
 	return err
 }
 
-func FetchUser(ctx context.Context, email string) (generated.FetchUserByEmailQueryRow, error) {
+func FetchUserByEmail(ctx context.Context, email string) (generated.FetchUserByEmailQueryRow, error) {
 	res, err := getInstance().FetchUserByEmailQuery(ctx, email)
 	if err == nil {
 		return res, nil
@@ -23,6 +23,16 @@ func FetchUser(ctx context.Context, email string) (generated.FetchUserByEmailQue
 	//TODO add logs
 	//TODO parse error and return relevant errors to caller
 	return generated.FetchUserByEmailQueryRow{}, err
+}
+
+func FetchUserByID(ctx context.Context, id uint32) (generated.FetchUserByIDRow, error) {
+	res, err := getInstance().FetchUserByID(ctx, id)
+	if err == nil {
+		return res, nil
+	}
+	//TODO add logs
+	//TODO parse error and return relevant errors to caller
+	return generated.FetchUserByIDRow{}, err
 }
 
 func FetchUserAccount(ctx context.Context, userID uint32) (generated.FetchUserAccountRow, error) {
@@ -33,6 +43,16 @@ func FetchUserAccount(ctx context.Context, userID uint32) (generated.FetchUserAc
 	//TODO add logs
 	//TODO parse error and return relevant errors to caller
 	return generated.FetchUserAccountRow{}, err
+}
+
+func FetchAccountByID(ctx context.Context, id uint32) (generated.FetchAccountByIDRow, error) {
+	res, err := getInstance().FetchAccountByID(ctx, id)
+	if err == nil {
+		return res, nil
+	}
+	//TODO add logs
+	//TODO parse error and return relevant errors to caller
+	return generated.FetchAccountByIDRow{}, err
 }
 
 func InsertAccount(ctx context.Context, params generated.InsertAccountParams) error {

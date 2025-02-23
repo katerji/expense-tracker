@@ -16,6 +16,10 @@ func (s *Service) GetUserAccount(ctx context.Context, userID uint32) (*Account, 
 	return s.repo.fetchUserAccount(ctx, userID)
 }
 
+func (s *Service) GetAccountByID(ctx context.Context, id uint32) (*Account, error) {
+	return s.repo.fetchAccountByID(ctx, id)
+}
+
 func (s *Service) CreateAccount(ctx context.Context, input CreateAccountInput) (*Account, error) {
 	err := s.repo.insertAccount(ctx, input)
 	if err != nil {
@@ -23,4 +27,17 @@ func (s *Service) CreateAccount(ctx context.Context, input CreateAccountInput) (
 	}
 
 	return s.GetUserAccount(ctx, input.UserID)
+}
+
+func (a *Account) Ctx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, User{}, a)
+}
+
+func AccountFromCtx(ctx context.Context) Account {
+	a, ok := ctx.Value(Account{}).(Account)
+	if !ok {
+		return Account{}
+	}
+
+	return a
 }

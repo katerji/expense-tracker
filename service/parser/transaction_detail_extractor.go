@@ -10,6 +10,7 @@ type transaction struct {
 	TimeOfPurchase int64   `json:"string"`
 	Description    string  `json:"description"`
 	Merchant       string  `json:"merchant"`
+	MerchantType   string  `json:"merchant_type"`
 }
 
 type TransactionDetailExtractor interface {

@@ -8,6 +8,17 @@ type Service struct {
 	repo repo
 }
 
+var instance *Service
+
+func GetServiceInstance() *Service {
+	if instance == nil {
+		instance = &Service{
+			repo: repo{},
+		}
+	}
+
+	return instance
+}
 func (s *Service) getOrCreateMerchant(ctx context.Context, merchantName, merchantTypeName string) (*merchant, bool) {
 	mType, ok := s.repo.getOrInsertMerchantType(ctx, merchantTypeName)
 	if !ok {
@@ -21,7 +32,7 @@ func (s *Service) getMerchantByID(ctx context.Context, id uint32) (*merchant, bo
 	return s.repo.getMerchantByID(ctx, id)
 }
 
-func (s *Service) registerExpense(ctx context.Context, input RegisterExpenseInput) (*Expense, bool) {
+func (s *Service) RegisterExpense(ctx context.Context, input RegisterExpenseInput) (*Expense, bool) {
 	merchant, ok := s.getOrCreateMerchant(ctx, input.MerchantName, input.MerchantType)
 	if !ok {
 		return nil, false

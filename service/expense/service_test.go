@@ -47,7 +47,7 @@ func TestRegisterExpense(t *testing.T) {
 	}
 	service := Service{}
 
-	expense, ok := service.registerExpense(ctx, registerExpenseInput)
+	expense, ok := service.RegisterExpense(ctx, registerExpenseInput)
 	if !ok {
 		t.Fatalf("failed to register expense")
 	}

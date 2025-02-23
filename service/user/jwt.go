@@ -9,22 +9,23 @@ import (
 	"time"
 )
 
-type customJWTClaims struct {
-	User      *User `json:"user"`
-	ExpiresAt int64 `json:"expires_at"`
+type CustomJWTClaims struct {
+	UserID    uint32 `json:"user_id"`
+	AccountID uint32 `json:"account_id"`
+	ExpiresAt int64  `json:"expires_at"`
 }
 
-func (s *Service) VerifyToken(token string) (*User, error) {
+func (s *Service) VerifyToken(token string) (*CustomJWTClaims, error) {
 	jwtSecret := env.JWTToken()
 	return s.validateToken(token, jwtSecret)
 }
 
-func (s *Service) VerifyRefreshToken(token string) (*User, error) {
+func (s *Service) VerifyRefreshToken(token string) (*CustomJWTClaims, error) {
 	jwtSecret := env.JWTRefreshToken()
 	return s.validateToken(token, jwtSecret)
 }
 
-func (s *Service) validateToken(token, jwtSecret string) (*User, error) {
+func (s *Service) validateToken(token, jwtSecret string) (*CustomJWTClaims, error) {
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -45,7 +46,7 @@ func (s *Service) validateToken(token, jwtSecret string) (*User, error) {
 		return nil, errors.New("error parsing token")
 	}
 
-	var customClaims customJWTClaims
+	var customClaims CustomJWTClaims
 	if err := json.Unmarshal(jsonClaims, &customClaims); err != nil {
 		return nil, errors.New("error parsing token")
 	}
@@ -55,7 +56,7 @@ func (s *Service) validateToken(token, jwtSecret string) (*User, error) {
 		return nil, errors.New("token expired")
 	}
 
-	return customClaims.User, nil
+	return &customClaims, nil
 }
 
 type jwtPair struct {

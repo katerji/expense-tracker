@@ -27,11 +27,26 @@ func (r repo) insertUser(ctx context.Context, userInput Input) (*User, error) {
 		return nil, ErrEmailAlreadyExists
 	}
 
-	return r.fetchUser(ctx, userInput.Email)
+	return r.fetchUserByEmail(ctx, userInput.Email)
 }
 
-func (r repo) fetchUser(ctx context.Context, email string) (*User, error) {
-	res, err := db.FetchUser(ctx, email)
+func (r repo) fetchUserByEmail(ctx context.Context, email string) (*User, error) {
+	res, err := db.FetchUserByEmail(ctx, email)
+	if err != nil {
+		return nil, ErrUnknown
+	}
+
+	return &User{
+		ID:        res.ID,
+		FirstName: res.FirstName,
+		LastName:  res.LastName,
+		Email:     res.Email,
+		Password:  res.Password,
+	}, nil
+}
+
+func (r repo) fetchUserByID(ctx context.Context, id uint32) (*User, error) {
+	res, err := db.FetchUserByID(ctx, id)
 	if err != nil {
 		return nil, ErrUnknown
 	}
@@ -46,6 +61,17 @@ func (r repo) fetchUser(ctx context.Context, email string) (*User, error) {
 }
 
 func (r repo) fetchUserAccount(ctx context.Context, userID uint32) (*Account, error) {
+	res, err := db.FetchUserAccount(ctx, userID)
+	if err != nil {
+		return nil, ErrUnknown
+	}
+
+	return &Account{
+		ID:   res.ID,
+		Name: res.Name,
+	}, nil
+}
+func (r repo) fetchAccountByID(ctx context.Context, userID uint32) (*Account, error) {
 	res, err := db.FetchUserAccount(ctx, userID)
 	if err != nil {
 		return nil, ErrUnknown
