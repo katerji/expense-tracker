@@ -8,7 +8,7 @@ import (
 
 type repo struct{}
 
-func (r repo) insertExpense(ctx context.Context, input CreateInput) (*Expense, bool) {
+func (r repo) insertExpense(ctx context.Context, input createExpenseInput) (*Expense, bool) {
 	queryParams, ok := input.queryParams()
 	if !ok {
 		return nil, false

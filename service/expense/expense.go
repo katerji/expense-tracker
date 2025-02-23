@@ -16,7 +16,7 @@ type Expense struct {
 	AccountID      uint32
 }
 
-type CreateInput struct {
+type createExpenseInput struct {
 	Amount         float64
 	Currency       string
 	TimeOfPurchase time.Time
@@ -25,7 +25,7 @@ type CreateInput struct {
 	AccountID      uint32
 }
 
-func (i CreateInput) queryParams() (generated.InsertExpenseQueryParams, bool) {
+func (i createExpenseInput) queryParams() (generated.InsertExpenseQueryParams, bool) {
 	return generated.InsertExpenseQueryParams{
 		Amount:   i.Amount,
 		Currency: i.Currency,
@@ -42,7 +42,7 @@ func (i CreateInput) queryParams() (generated.InsertExpenseQueryParams, bool) {
 	}, true
 }
 
-func (i CreateInput) expense(id uint32) *Expense {
+func (i createExpenseInput) expense(id uint32) *Expense {
 	return &Expense{
 		ID:             id,
 		Amount:         i.Amount,
@@ -52,4 +52,14 @@ func (i CreateInput) expense(id uint32) *Expense {
 		MerchantID:     i.MerchantID,
 		AccountID:      i.AccountID,
 	}
+}
+
+type RegisterExpenseInput struct {
+	Amount         float64
+	Currency       string
+	TimeOfPurchase time.Time
+	Description    string
+	MerchantName   string
+	MerchantType   string
+	AccountID      uint32
 }
