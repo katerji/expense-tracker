@@ -21,33 +21,33 @@ func (r repo) insertExpense(ctx context.Context, input CreateInput) (*Expense, b
 	return input.expense(insertID), true
 }
 
-func (r repo) insertMerchant(ctx context.Context, input insertMerchantInput) (uint32, bool) {
+func (r repo) insertMerchant(ctx context.Context, input createMerchantInput) (uint32, bool) {
 	return db.InsertMerchant(ctx, generated.InsertMerchantQueryParams(input))
 }
 
 func (r repo) fetchMerchantByName(ctx context.Context, merchantName string) (*merchant, bool) {
-	queryRes, err := db.FetchMerchantByName(ctx, merchantName)
-	if err != nil {
+	queryRes, ok := db.FetchMerchantByName(ctx, merchantName)
+	if !ok {
 		return nil, false
 	}
 
 	return &merchant{
 		ID:   queryRes.ID,
 		Name: queryRes.Name,
-		merchantType: merchantType{
+		merchantType: &merchantType{
 			ID:   queryRes.TypeID,
 			Type: queryRes.MerchantType,
 		},
 	}, true
 }
 
-func (r repo) getOrInsertMerchant(ctx context.Context, name string, mType merchantType) (*merchant, bool) {
+func (r repo) getOrInsertMerchant(ctx context.Context, name string, mType *merchantType) (*merchant, bool) {
 	m, ok := r.fetchMerchantByName(ctx, name)
 	if ok {
 		return m, true
 	}
 
-	merchantID, ok := r.insertMerchant(ctx, insertMerchantInput{
+	merchantID, ok := r.insertMerchant(ctx, createMerchantInput{
 		Name:   name,
 		TypeID: mType.ID,
 	})
@@ -63,14 +63,14 @@ func (r repo) getOrInsertMerchant(ctx context.Context, name string, mType mercha
 }
 
 func (r repo) insertMerchantType(ctx context.Context, typeName string) (*merchantType, bool) {
-	res, ok := db.FetchMerchantType(ctx, typeName)
+	id, ok := db.InsertMerchantType(ctx, typeName)
 	if !ok {
 		return nil, false
 	}
 
 	return &merchantType{
-		ID:   res.ID,
-		Type: res.Type,
+		ID:   id,
+		Type: typeName,
 	}, true
 }
 
@@ -93,4 +93,20 @@ func (r repo) getOrInsertMerchantType(ctx context.Context, typeName string) (*me
 	}
 
 	return r.insertMerchantType(ctx, typeName)
+}
+
+func (r repo) getMerchantByID(ctx context.Context, id uint32) (*merchant, bool) {
+	res, ok := db.FetchMerchantByID(ctx, id)
+	if !ok {
+		return nil, false
+	}
+
+	return &merchant{
+		ID:   res.ID,
+		Name: res.Name,
+		merchantType: &merchantType{
+			ID:   res.TypeID,
+			Type: res.MerchantType,
+		},
+	}, true
 }

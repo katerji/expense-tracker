@@ -2,7 +2,13 @@
 SELECT m.id, m.name, m.type_id, mt.type as merchant_type
 FROM merchant m
          JOIN merchant_type mt ON m.type_id = mt.id
-WHERE type = ?;
+WHERE m.name = ?;
+
+-- name: FetchMerchantByIDQuery :one
+SELECT m.id, m.name, m.type_id, mt.type as merchant_type
+FROM merchant m
+         JOIN merchant_type mt ON m.type_id = mt.id
+WHERE m.id = ?;
 
 -- name: FetchMerchantTypeQuery :one
 SELECT id, type

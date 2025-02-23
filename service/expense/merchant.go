@@ -3,7 +3,7 @@ package expense
 type merchant struct {
 	ID           uint32
 	Name         string
-	merchantType merchantType
+	merchantType *merchantType
 }
 
 type merchantType struct {
@@ -11,7 +11,7 @@ type merchantType struct {
 	Type string
 }
 
-type insertMerchantInput struct {
-	Name string
+type createMerchantInput struct {
+	Name   string
 	TypeID uint32
 }
